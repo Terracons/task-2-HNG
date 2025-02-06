@@ -1,9 +1,10 @@
 import express from "express"
 import cors from "cors"
+import axios from "axios";
 
 const app = express();
 
-app.use(cors);
+app.use(cors());
 
 // Funtion to check for perfect number 
 const isPerfectNum = (num)=>{
@@ -45,7 +46,7 @@ const getFunFact = async (num) => {
 };
 
 
-app.get("/api/classify-number", (req, res)=>{
+app.get("/api/classify-number", async (req, res)=>{
     const {number} = req.query;
     if (!number || isNaN(number)){
         return res.status(400).json({ number, error: true });
@@ -55,6 +56,7 @@ app.get("/api/classify-number", (req, res)=>{
 
     if (isArmstrongNum(num)) properties.push("armstrong");
     properties.push(num % 2 === 0 ? "even" : "odd");
+    const funFact = await getFunFact(num);
 
     const result =  {
         number: num,
@@ -62,7 +64,7 @@ app.get("/api/classify-number", (req, res)=>{
         is_perfect: isPerfectNum(num),
         properties,
         digit_sum: num.toString().split("").map(Number).reduce((a, b) => a + b, 0),
-        fun_fact: getFunFact(num),
+        fun_fact: funFact,
     };
 
     res.json(result);
